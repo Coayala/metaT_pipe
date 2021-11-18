@@ -97,6 +97,8 @@ def get_args():
                             help='Choose to use either bwa-mem or bowtie2 for mapping the reads',
                             default='bwa-mem')
 
+    parser_cr.set_defaults(func=map_reads)
+
     parser_gc = subparser.add_parser('get_read_counts',
                                      help='Module to obtain read counts from the mapping files')
 
@@ -108,6 +110,8 @@ def get_args():
                            type=str,
                            required=True,
                            help='gff file with the gene coordinates to extract counts')
+
+    parser_gc.set_defaults(func=get_read_counts)
 
     args = parser.parse_args()
 
