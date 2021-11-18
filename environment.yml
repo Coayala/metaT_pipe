@@ -33,6 +33,7 @@ dependencies:
   - ruby
   - samtools
   - bedtools >2.24
+  - seqkit
   - pip
   - pip:
     - DRAM-bio
