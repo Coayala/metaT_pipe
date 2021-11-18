@@ -1,4 +1,5 @@
 # metaT_pipe
+<p align="center"><img src="metaT_pipeline_graph.png" alt="pipelines"></p>
 Scripts for running metatranscriptomic analysis
 ## Dependencies
 The following software is required to run this pipeline:
