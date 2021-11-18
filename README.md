@@ -14,3 +14,27 @@ The following software is required to run this pipeline:
 - [GTDB-Tk](https://ecogenomics.github.io/GTDBTk/) taxonomic assignment
 - [CoverM](https://github.com/wwood/CoverM) reads mapping
 - [dirseq](https://github.com/wwood/dirseq) gene counts
+
+## Installation
+
+- Clone the repository in your home directory and make the script executable 
+
+```
+git clone https://github.com/Coayala/metaT_pipe.git
+cd metaT_pipe
+chmod +x metaT_pipe.py
+```
+- Create and activate environment
+
+```
+conda env create -f environment.yml
+conda activate metaT_pipe
+```
+-Finish DRAM and GDTB-Tk installation
+**For DRAM** follow the instructions for [DRAM septup](https://github.com/shafferm/DRAM/wiki#dram-setup)
+**For GDTB-Tk** run the following
+```
+download-db.sh
+```
+
+
