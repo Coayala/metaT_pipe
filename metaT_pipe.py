@@ -83,17 +83,17 @@ def get_args():
     parser_map.add_argument('--r1',
                             type=str,
                             help='Forward reads for mapping in fastq format',
-                            default='None')
+                            default=None)
 
     parser_map.add_argument('--r2',
                             type=str,
                             help='Reverse reads for mapping in fastq format',
-                            default='None')
+                            default=None)
 
     parser_map.add_argument('--interleaved',
                             type=str,
                             help='Interleaved reads for mapping in fastq format',
-                            default='None')
+                            default=None)
 
     parser_map.add_argument('--mapper',
                             type=str,
@@ -101,7 +101,7 @@ def get_args():
                             help='Choose to use either bwa-mem or bowtie2 for mapping the reads',
                             default='bwa-mem')
 
-    parser_cr.set_defaults(func=map_reads)
+    parser_map.set_defaults(func=map_reads)
 
     parser_gc = subparser.add_parser('get_read_counts',
                                      help='Module to obtain read counts from the mapping files')
@@ -221,7 +221,7 @@ def map_reads(args):
 
     outdir = os.path.join(args.outdir, 'map_reads')
     
-    if args.interleaved != 'None':
+    if args.interleaved:
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '--interleaved', args.interleaved, '-p', args.mapper,
                '-o', outdir, '-t', args.threads]
         run_commands(cmd)
