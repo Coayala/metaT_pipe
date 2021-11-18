@@ -216,7 +216,8 @@ def map_reads(args):
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '--interleaved', args.interleaved, '-p', args.mapper,
                '-o', outdir, '-t', args.threads]
         run_commands(cmd)
-        bam_file = os.path.join(outdir, args.mapping_reference + args.interleaved + '.bam')
+        bam_file = os.path.join(outdir, os.path.basename(args.mapping_reference) + os.path.basename(args.interleaved) +
+                                '.bam')
     else:
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '-1', args.r1, '-2', args.r2, '-p', args.mapper,
                '-o', outdir, '-t', args.threads]
