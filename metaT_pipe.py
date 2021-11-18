@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Author : Christian Ayala <cayalaortiz@email.arizona.edu>
+Author : Christian Ayala <cayalaortiz@email.arizona.edu>, Viviana Freire <vfreirezapata@email.arizona.edu>
 Date   : 2021-04-19
 Purpose: Generate jobs scripts to be submitted to the UA HPC clusters
 """
@@ -75,21 +75,25 @@ def get_args():
     parser_map = subparser.add_parser('map_reads',
                                       help='Module to map reads to defined reference')
 
-    parser_map.add_argument('mapping_reference',
+    parser_map.add_argument('--mapping_reference',
                             type=str,
-                            help='Reference in fasta format to map the reads')
+                            help='Reference in fasta format to map the reads',
+                            default=None)
 
     parser_map.add_argument('-r1',
                             type=str,
-                            help='Forward reads for mapping in fastq format')
+                            help='Forward reads for mapping in fastq format',
+                            default=None)
 
     parser_map.add_argument('-r2',
                             type=str,
-                            help='Reverse reads for mapping in fastq format')
+                            help='Reverse reads for mapping in fastq format',
+                            default=None)
 
     parser_map.add_argument('--interleaved',
                             type=str,
-                            help='Interleaved reads for mapping in fastq format')
+                            help='Interleaved reads for mapping in fastq format',
+                            default=None)
 
     parser_map.add_argument('--mapper',
                             type=str,
