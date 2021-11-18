@@ -83,17 +83,17 @@ def get_args():
     parser_map.add_argument('--r1',
                             type=str,
                             help='Forward reads for mapping in fastq format',
-                            default=None)
+                            default='None')
 
     parser_map.add_argument('--r2',
                             type=str,
                             help='Reverse reads for mapping in fastq format',
-                            default=None)
+                            default='None')
 
     parser_map.add_argument('--interleaved',
                             type=str,
                             help='Interleaved reads for mapping in fastq format',
-                            default=None)
+                            default='None')
 
     parser_map.add_argument('--mapper',
                             type=str,
@@ -220,7 +220,8 @@ def map_reads(args):
     """Map reads to reference"""
 
     outdir = os.path.join(args.outdir, 'map_reads')
-    if args.interleaved is not None:
+    
+    if args.interleaved != 'None':
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '--interleaved', args.interleaved, '-p', args.mapper,
                '-o', outdir, '-t', args.threads]
         run_commands(cmd)
