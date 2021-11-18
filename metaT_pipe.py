@@ -80,12 +80,12 @@ def get_args():
                             help='Reference in fasta format to map the reads',
                             default=None)
 
-    parser_map.add_argument('-r1',
+    parser_map.add_argument('--r1',
                             type=str,
                             help='Forward reads for mapping in fastq format',
                             default=None)
 
-    parser_map.add_argument('-r2',
+    parser_map.add_argument('--r2',
                             type=str,
                             help='Reverse reads for mapping in fastq format',
                             default=None)
