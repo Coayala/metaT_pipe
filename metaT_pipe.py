@@ -220,7 +220,7 @@ def map_reads(args):
     """Map reads to reference"""
 
     outdir = os.path.join(args.outdir, 'map_reads')
-    if args.interleaved:
+    if args.interleaved is not None:
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '--interleaved', args.interleaved, '-p', args.mapper,
                '-o', outdir, '-t', args.threads]
         run_commands(cmd)
