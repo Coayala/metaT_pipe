@@ -8,4 +8,4 @@ The following software is required to run this pipeline:
 - [CheckM](https://github.com/Ecogenomics/CheckM) quality control of metagenomes
 - [GTDB-Tk](https://ecogenomics.github.io/GTDBTk/) taxonomic assignment
 - [CoverM](https://github.com/wwood/CoverM) reads mapping
-- [dirseq](https://github.com/wwood/dirseq)
+- [dirseq](https://github.com/wwood/dirseq) gene counts
