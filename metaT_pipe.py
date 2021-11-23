@@ -281,7 +281,7 @@ def map_reads(args):
         bam_file = os.path.join(outdir, args.mapping_reference + args.interleaved + '.bam')
 
     filtered_bam_file = 'filtered.' + bam_file
-    cmd = ['coverm', 'filter', '-b', bam_file, '-o', '-t', filtered_bam_file, str(args.threads)]
+    cmd = ['coverm', 'filter', '-b', bam_file, '-o', filtered_bam_file, '-t', str(args.threads)]
     run_commands(cmd)
 
     sorted_bam_file = 'sorted.' + filtered_bam_file
