@@ -43,7 +43,6 @@ def get_args():
 
     parser_cr.add_argument('-t',
                            '--threads',
-                           type=int,
                            help='Number of threads',
                            default=10)
 
@@ -80,7 +79,6 @@ def get_args():
 
     parser_an.add_argument('-t',
                            '--threads',
-                           type=int,
                            help='Number of threads',
                            default=10)
 
@@ -120,7 +118,6 @@ def get_args():
 
     parser_map.add_argument('-t',
                             '--threads',
-                            type=int,
                             help='Number of threads',
                             default=10)
 
@@ -146,9 +143,8 @@ def get_args():
 
     parser_gc.add_argument('-t',
                            '--threads',
-                           type=int,
                            help='Number of threads',
-                           default=10)
+                           default=30)
 
     parser_gc.set_defaults(func=get_read_counts)
 
@@ -180,7 +176,8 @@ def create_reference(args):
     inputdir = os.path.join(args.input_directory, '*.fna')
     outdir = os.path.join(args.outdir, 'create_reference')
 
-    os.makedirs(outdir)
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
     if args.input_type == 'bins':
         cmd = ['dRep', 'dereplicate', outdir, '-g', inputdir]
@@ -207,7 +204,8 @@ def annotate_reference(args):
 
     outdir = os.path.join(args.outdir, 'annotate_reference')
 
-    os.makedirs(outdir)
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
     if args.reference_type == 'bins':
         if not args.no_checkm:
@@ -267,12 +265,12 @@ def map_reads(args):
 
     outdir = os.path.join(args.outdir, 'map_reads')
 
-    os.makedirs(outdir)
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
     if args.interleaved:
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '--interleaved', args.interleaved, '-p', args.mapper,
                '-o', outdir, '-t', str(args.threads)]
-        print(cmd)
         run_commands(cmd)
         bam_file = os.path.join(outdir, os.path.basename(args.mapping_reference) + os.path.basename(args.interleaved) +
                                 '.bam')
@@ -303,7 +301,8 @@ def get_read_counts(args):
 
     outdir = os.path.join(args.outdir, 'get_read_counts')
 
-    os.makedirs(outdir)
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
     bam_files = glob.glob(args.mapping_directory + '**.bam')
 
