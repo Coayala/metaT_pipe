@@ -97,7 +97,7 @@ def get_args():
                             '--threads',
                             type=int,
                             help='Number of threads',
-                            default='10')
+                            default=10)
 
     parser_map.set_defaults(func=map_reads)
 
@@ -126,14 +126,9 @@ def get_args():
 def run_commands(cmd):
     """Function to run commands in the command line"""
 
-    p = subprocess.Popen(
-        cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    p = subprocess.run(
+        cmd, shell=False, check=True, stderr=subprocess.STDOUT
     )
-    out, err = p.communicate()
-    if out:
-        print(out)
-    if err:
-        print(err)
 
 
 # --------------------------------------------------
@@ -220,7 +215,7 @@ def map_reads(args):
     outdir = os.path.join(args.outdir, 'map_reads')
     if args.interleaved:
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '--interleaved', args.interleaved, '-p', args.mapper,
-               '-o', outdir, '-t', args.threads]
+               '-o', outdir, '-t', str(args.threads)]
         print(cmd)
         run_commands(cmd)
         bam_file = os.path.join(outdir, os.path.basename(args.mapping_reference) + os.path.basename(args.interleaved) +
