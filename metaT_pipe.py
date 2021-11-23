@@ -272,23 +272,22 @@ def map_reads(args):
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '--interleaved', args.interleaved, '-p', args.mapper,
                '-o', outdir, '-t', str(args.threads)]
         run_commands(cmd)
-        bam_file = os.path.join(outdir, os.path.basename(args.mapping_reference) + '.' + os.path.basename(args.interleaved) +
-                                '.bam')
+        bam_file = os.path.basename(args.mapping_reference) + '.' + os.path.basename(args.interleaved) + '.bam'
     else:
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '-1', args.r1, '-2', args.r2, '-p', args.mapper,
                '-o', outdir, '-t', str(args.threads)]
         run_commands(cmd)
         bam_file = os.path.join(outdir, args.mapping_reference + args.interleaved + '.bam')
 
-    filtered_bam_file = 'filtered.' + bam_file
-    cmd = ['coverm', 'filter', '-b', bam_file, '-o', filtered_bam_file, '-t', str(args.threads)]
+    filtered_bam_file = 'filtered' + bam_file
+    cmd = ['coverm', 'filter', '-b', bam_file, '-o', os.path.join(outdir, filtered_bam_file), '-t', str(args.threads)]
     run_commands(cmd)
 
     sorted_bam_file = 'sorted.' + filtered_bam_file
-    cmd = ['samtools', 'sort', filtered_bam_file, '-o', sorted_bam_file]
+    cmd = ['samtools', 'sort', filtered_bam_file, '-o', os.path.join(outdir, sorted_bam_file)]
     run_commands(cmd)
 
-    cmd = ['samtools', 'index', '-b', sorted_bam_file]
+    cmd = ['samtools', 'index', '-b', os.path.join(outdir, sorted_bam_file)]
     run_commands(cmd)
 
 
