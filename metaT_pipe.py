@@ -96,7 +96,8 @@ def get_args():
     parser_map.add_argument('-t',
                             '--threads',
                             type=int,
-                            help='Number of threads')
+                            help='Number of threads',
+                            default='10')
 
     parser_map.set_defaults(func=map_reads)
 
@@ -149,7 +150,7 @@ def create_reference(args):
         cmd = ['cat', inputdir, '>', 'concat_contigs.fasta']
         run_commands(cmd)
         cmd = ['cd-hit-est', '-i', 'concat_contigs.fasta', '-o', 'temp_contigs99.fasta',
-               '-c', '0.99', '-n', '10', '-T', args.threads]
+               '-c', '0.99', '-n', '10', '-T', str(args.threads)]
         run_commands(cmd)
         cmd = ['seqkit', 'seq', '-m', '2000', 'temp_contigs99.fasta', '>',
                os.path.join(outdir, 'derep_contigs99.fasta')]
@@ -165,7 +166,7 @@ def annotate_reference(args):
     outdir = os.path.join(args.outdir, 'annotate_reference')
     if args.reference_type == 'bins':
         if not args.no_checkm:
-            cmd = ['checkm', 'lineage_wf', '-t', args.threads, '-x', 'fna', args.input_reference,
+            cmd = ['checkm', 'lineage_wf', '-t', str(args.threads), '-x', 'fna', args.input_reference,
                    os.path.join(outdir, 'checkm_results')]
             run_commands(cmd)
             cmd = ['checkm', 'qa', os.path.join(outdir, 'checkm_results', 'lineage.ms'),
@@ -174,7 +175,7 @@ def annotate_reference(args):
             run_commands(cmd)
         if not args.no_gtdbtk:
             cmd = ['gtdbtk', 'classify_wf', '--genome_dir', args.input_reference, '--out_dir',
-                   os.path.join(outdir, 'gtdb-tk_results'), '--cpus', args.threads]
+                   os.path.join(outdir, 'gtdb-tk_results'), '--cpus', str(args.threads)]
             run_commands(cmd)
 
         if args.no_checkm is False and args.no_gtdbtk is False:
@@ -182,33 +183,33 @@ def annotate_reference(args):
                    os.path.join(outdir, 'dram_results'), '--checkm_quality',
                    os.path.join(outdir, 'checkm_results', 'checkm_table.tsv'), '--gtdb_taxonomy',
                    os.path.join(outdir, 'gtdb-tk_results', 'classify', 'gtdbtk.bac120.summary.tsv'),
-                   '--threads', args.threads]
+                   '--threads', str(args.threads)]
             run_commands(cmd)
 
         elif args.no_checkm is True and args.no_gtdbtk is False:
             cmd = ['DRAM.py', 'annotate', '-i', "'" + os.path.join(args.input_reference, '*.fna') + "'", '-o',
                    os.path.join(outdir, 'dram_results'), '--gtdb_taxonomy',
                    os.path.join(outdir, 'gtdb-tk_results', 'classify', 'gtdbtk.bac120.summary.tsv'),
-                   '--threads', args.threads]
+                   '--threads', str(args.threads)]
             run_commands(cmd)
 
         elif args.no_checkm is False and args.no_gtdbtk is True:
             cmd = ['DRAM.py', 'annotate', '-i', "'" + os.path.join(args.input_reference, '*.fna') + "'", '-o',
                    os.path.join(outdir, 'dram_results'), '--checkm_quality',
                    os.path.join(outdir, 'checkm_results', 'checkm_table.tsv'),
-                   '--threads', args.threads]
+                   '--threads', str(args.threads)]
             run_commands(cmd)
 
         if args.no_checkm is True and args.no_gtdbtk is True:
             cmd = ['DRAM.py', 'annotate', '-i', "'" + os.path.join(args.input_reference, '*.fna') + "'", '-o',
                    os.path.join(outdir, 'dram_results'),
-                   '--threads', args.threads]
+                   '--threads', str(args.threads)]
             run_commands(cmd)
 
     if args.reference_type == 'contigs':
         cmd = ['DRAM.py', 'annotate', '-i', args.input_reference, '-o',
                os.path.join(outdir, 'dram_results'),
-               '--threads', args.threads]
+               '--threads', str(args.threads)]
         run_commands(cmd)
 
 
@@ -219,19 +220,19 @@ def map_reads(args):
     outdir = os.path.join(args.outdir, 'map_reads')
     if args.interleaved:
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '--interleaved', args.interleaved, '-p', args.mapper,
-               '-o', outdir, '-t', args.threads]
+               '-o', outdir, '-t', str(args.threads)]
         print(cmd)
         run_commands(cmd)
         bam_file = os.path.join(outdir, os.path.basename(args.mapping_reference) + os.path.basename(args.interleaved) +
                                 '.bam')
     else:
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '-1', args.r1, '-2', args.r2, '-p', args.mapper,
-               '-o', outdir, '-t', args.threads]
+               '-o', outdir, '-t', str(args.threads)]
         run_commands(cmd)
         bam_file = os.path.join(outdir, args.mapping_reference + args.interleaved + '.bam')
 
     filtered_bam_file = 'filtered.' + bam_file
-    cmd = ['coverm', 'filter', '-b', bam_file, '-o', '-t', filtered_bam_file, args.threads]
+    cmd = ['coverm', 'filter', '-b', bam_file, '-o', '-t', filtered_bam_file, str(args.threads)]
     run_commands(cmd)
 
     sorted_bam_file = 'sorted.' + filtered_bam_file
