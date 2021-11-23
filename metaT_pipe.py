@@ -20,17 +20,6 @@ def get_args():
         description='Run modules for metatranscriptomics analysis',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('-o',
-                        '--outdir',
-                        type=str,
-                        help='Output directory',
-                        default='metaT_pipe_out')
-
-    parser.add_argument('-t',
-                        '--threads',
-                        type=int,
-                        help='Number of threads')
-
     subparser = parser.add_subparsers()
 
     parser_cr = subparser.add_parser('create_reference',
@@ -80,20 +69,17 @@ def get_args():
                             help='Reference in fasta format to map the reads',
                             default=None)
 
-    parser_map.add_argument('--r1',
+    parser_map.add_argument('-r1',
                             type=str,
-                            help='Forward reads for mapping in fastq format',
-                            default=None)
+                            help='Forward reads for mapping in fastq format')
 
-    parser_map.add_argument('--r2',
+    parser_map.add_argument('-r2',
                             type=str,
-                            help='Reverse reads for mapping in fastq format',
-                            default=None)
+                            help='Reverse reads for mapping in fastq format')
 
     parser_map.add_argument('--interleaved',
                             type=str,
-                            help='Interleaved reads for mapping in fastq format',
-                            default=None)
+                            help='Interleaved reads for mapping in fastq format')
 
     parser_map.add_argument('--mapper',
                             type=str,
@@ -101,7 +87,18 @@ def get_args():
                             help='Choose to use either bwa-mem or bowtie2 for mapping the reads',
                             default='bwa-mem')
 
-    parser_map.set_defaults(func=map_reads)
+    parser_map.add_argument('-o',
+                            '--outdir',
+                            type=str,
+                            help='Output directory',
+                            default='metaT_pipe_out')
+
+    parser_map.add_argument('-t',
+                            '--threads',
+                            type=int,
+                            help='Number of threads')
+
+    parser_cr.set_defaults(func=map_reads)
 
     parser_gc = subparser.add_parser('get_read_counts',
                                      help='Module to obtain read counts from the mapping files')
@@ -220,10 +217,10 @@ def map_reads(args):
     """Map reads to reference"""
 
     outdir = os.path.join(args.outdir, 'map_reads')
-    
     if args.interleaved:
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '--interleaved', args.interleaved, '-p', args.mapper,
                '-o', outdir, '-t', args.threads]
+        print(cmd)
         run_commands(cmd)
         bam_file = os.path.join(outdir, os.path.basename(args.mapping_reference) + os.path.basename(args.interleaved) +
                                 '.bam')
