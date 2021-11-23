@@ -34,6 +34,19 @@ def get_args():
                            choices=['contigs', 'bins'],
                            help='Input data type: bins or contigs',
                            default='bins')
+
+    parser_cr.add_argument('-o',
+                           '--outdir',
+                           type=str,
+                           help='Output directory',
+                           default='metaT_pipe_out')
+
+    parser_cr.add_argument('-t',
+                           '--threads',
+                           type=int,
+                           help='Number of threads',
+                           default=10)
+
     parser_cr.set_defaults(func=create_reference)
 
     parser_an = subparser.add_parser('annotate_reference',
@@ -58,6 +71,18 @@ def get_args():
                            action='store_true',
                            help='Do not run GTDB-TK',
                            default=True)
+
+    parser_an.add_argument('-o',
+                           '--outdir',
+                           type=str,
+                           help='Output directory',
+                           default='metaT_pipe_out')
+
+    parser_an.add_argument('-t',
+                           '--threads',
+                           type=int,
+                           help='Number of threads',
+                           default=10)
 
     parser_an.set_defaults(func=annotate_reference)
 
@@ -113,6 +138,18 @@ def get_args():
                            required=True,
                            help='gff file with the gene coordinates to extract counts')
 
+    parser_gc.add_argument('-o',
+                           '--outdir',
+                           type=str,
+                           help='Output directory',
+                           default='metaT_pipe_out')
+
+    parser_gc.add_argument('-t',
+                           '--threads',
+                           type=int,
+                           help='Number of threads',
+                           default=10)
+
     parser_gc.set_defaults(func=get_read_counts)
 
     args = parser.parse_args()
@@ -130,13 +167,20 @@ def run_commands(cmd):
         cmd, shell=False, check=True, stderr=subprocess.STDOUT
     )
 
+    return p
+
 
 # --------------------------------------------------
 def create_reference(args):
     """Create reference file for mapping"""
 
+    if not os.path.exists(args.outdir):
+        os.makedirs(args.outdir)
+
     inputdir = os.path.join(args.input_directory, '*.fna')
     outdir = os.path.join(args.outdir, 'create_reference')
+
+    os.makedirs(outdir)
 
     if args.input_type == 'bins':
         cmd = ['dRep', 'dereplicate', outdir, '-g', inputdir]
@@ -145,7 +189,7 @@ def create_reference(args):
         cmd = ['cat', inputdir, '>', 'concat_contigs.fasta']
         run_commands(cmd)
         cmd = ['cd-hit-est', '-i', 'concat_contigs.fasta', '-o', 'temp_contigs99.fasta',
-               '-c', '0.99', '-n', '10', '-T', args.threads]
+               '-c', '0.99', '-n', '10', '-T', str(args.threads)]
         run_commands(cmd)
         cmd = ['seqkit', 'seq', '-m', '2000', 'temp_contigs99.fasta', '>',
                os.path.join(outdir, 'derep_contigs99.fasta')]
@@ -158,10 +202,18 @@ def create_reference(args):
 def annotate_reference(args):
     """Annotate reference"""
 
+    if not os.path.exists(args.outdir):
+        os.makedirs(args.outdir)
+
+    inputdir = os.path.join(args.input_directory, '*.fna')
+    outdir = os.path.join(args.outdir, 'create_reference')
+
+    os.makedirs(outdir)
+
     outdir = os.path.join(args.outdir, 'annotate_reference')
     if args.reference_type == 'bins':
         if not args.no_checkm:
-            cmd = ['checkm', 'lineage_wf', '-t', args.threads, '-x', 'fna', args.input_reference,
+            cmd = ['checkm', 'lineage_wf', '-t', str(args.threads), '-x', 'fna', args.input_reference,
                    os.path.join(outdir, 'checkm_results')]
             run_commands(cmd)
             cmd = ['checkm', 'qa', os.path.join(outdir, 'checkm_results', 'lineage.ms'),
@@ -170,7 +222,7 @@ def annotate_reference(args):
             run_commands(cmd)
         if not args.no_gtdbtk:
             cmd = ['gtdbtk', 'classify_wf', '--genome_dir', args.input_reference, '--out_dir',
-                   os.path.join(outdir, 'gtdb-tk_results'), '--cpus', args.threads]
+                   os.path.join(outdir, 'gtdb-tk_results'), '--cpus', str(args.threads)]
             run_commands(cmd)
 
         if args.no_checkm is False and args.no_gtdbtk is False:
@@ -178,39 +230,47 @@ def annotate_reference(args):
                    os.path.join(outdir, 'dram_results'), '--checkm_quality',
                    os.path.join(outdir, 'checkm_results', 'checkm_table.tsv'), '--gtdb_taxonomy',
                    os.path.join(outdir, 'gtdb-tk_results', 'classify', 'gtdbtk.bac120.summary.tsv'),
-                   '--threads', args.threads]
+                   '--threads', str(args.threads)]
             run_commands(cmd)
 
         elif args.no_checkm is True and args.no_gtdbtk is False:
             cmd = ['DRAM.py', 'annotate', '-i', "'" + os.path.join(args.input_reference, '*.fna') + "'", '-o',
                    os.path.join(outdir, 'dram_results'), '--gtdb_taxonomy',
                    os.path.join(outdir, 'gtdb-tk_results', 'classify', 'gtdbtk.bac120.summary.tsv'),
-                   '--threads', args.threads]
+                   '--threads', str(args.threads)]
             run_commands(cmd)
 
         elif args.no_checkm is False and args.no_gtdbtk is True:
             cmd = ['DRAM.py', 'annotate', '-i', "'" + os.path.join(args.input_reference, '*.fna') + "'", '-o',
                    os.path.join(outdir, 'dram_results'), '--checkm_quality',
                    os.path.join(outdir, 'checkm_results', 'checkm_table.tsv'),
-                   '--threads', args.threads]
+                   '--threads', str(args.threads)]
             run_commands(cmd)
 
         if args.no_checkm is True and args.no_gtdbtk is True:
             cmd = ['DRAM.py', 'annotate', '-i', "'" + os.path.join(args.input_reference, '*.fna') + "'", '-o',
                    os.path.join(outdir, 'dram_results'),
-                   '--threads', args.threads]
+                   '--threads', str(args.threads)]
             run_commands(cmd)
 
     if args.reference_type == 'contigs':
         cmd = ['DRAM.py', 'annotate', '-i', args.input_reference, '-o',
                os.path.join(outdir, 'dram_results'),
-               '--threads', args.threads]
+               '--threads', str(args.threads)]
         run_commands(cmd)
 
 
 # --------------------------------------------------
 def map_reads(args):
     """Map reads to reference"""
+
+    if not os.path.exists(args.outdir):
+        os.makedirs(args.outdir)
+
+    inputdir = os.path.join(args.input_directory, '*.fna')
+    outdir = os.path.join(args.outdir, 'create_reference')
+
+    os.makedirs(outdir)
 
     outdir = os.path.join(args.outdir, 'map_reads')
     if args.interleaved:
@@ -222,12 +282,12 @@ def map_reads(args):
                                 '.bam')
     else:
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '-1', args.r1, '-2', args.r2, '-p', args.mapper,
-               '-o', outdir, '-t', args.threads]
+               '-o', outdir, '-t', str(args.threads)]
         run_commands(cmd)
         bam_file = os.path.join(outdir, args.mapping_reference + args.interleaved + '.bam')
 
     filtered_bam_file = 'filtered.' + bam_file
-    cmd = ['coverm', 'filter', '-b', bam_file, '-o', '-t', filtered_bam_file, args.threads]
+    cmd = ['coverm', 'filter', '-b', bam_file, '-o', '-t', filtered_bam_file, str(args.threads)]
     run_commands(cmd)
 
     sorted_bam_file = 'sorted.' + filtered_bam_file
@@ -241,6 +301,14 @@ def map_reads(args):
 # --------------------------------------------------
 def get_read_counts(args):
     """Get number of reads that mapped to each gene"""
+
+    if not os.path.exists(args.outdir):
+        os.makedirs(args.outdir)
+
+    inputdir = os.path.join(args.input_directory, '*.fna')
+    outdir = os.path.join(args.outdir, 'create_reference')
+
+    os.makedirs(outdir)
 
     outdir = os.path.join(args.outdir, 'get_read_counts')
     bam_files = glob.glob(args.mapping_directory + '**.bam')
@@ -264,7 +332,7 @@ def get_read_counts(args):
 
 # --------------------------------------------------
 def main():
-    """Generate the job file"""
+    """Run metaT pipeline"""
 
     args = get_args()
     args.func(args)
