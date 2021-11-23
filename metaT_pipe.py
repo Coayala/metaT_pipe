@@ -98,7 +98,7 @@ def get_args():
                             type=int,
                             help='Number of threads')
 
-    parser_cr.set_defaults(func=map_reads)
+    parser_map.set_defaults(func=map_reads)
 
     parser_gc = subparser.add_parser('get_read_counts',
                                      help='Module to obtain read counts from the mapping files')
