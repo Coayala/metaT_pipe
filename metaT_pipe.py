@@ -205,12 +205,10 @@ def annotate_reference(args):
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
 
-    inputdir = os.path.join(args.input_directory, '*.fna')
-    outdir = os.path.join(args.outdir, 'create_reference')
+    outdir = os.path.join(args.outdir, 'annotate_reference')
 
     os.makedirs(outdir)
 
-    outdir = os.path.join(args.outdir, 'annotate_reference')
     if args.reference_type == 'bins':
         if not args.no_checkm:
             cmd = ['checkm', 'lineage_wf', '-t', str(args.threads), '-x', 'fna', args.input_reference,
@@ -267,12 +265,10 @@ def map_reads(args):
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
 
-    inputdir = os.path.join(args.input_directory, '*.fna')
-    outdir = os.path.join(args.outdir, 'create_reference')
+    outdir = os.path.join(args.outdir, 'map_reads')
 
     os.makedirs(outdir)
 
-    outdir = os.path.join(args.outdir, 'map_reads')
     if args.interleaved:
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '--interleaved', args.interleaved, '-p', args.mapper,
                '-o', outdir, '-t', str(args.threads)]
@@ -305,12 +301,10 @@ def get_read_counts(args):
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
 
-    inputdir = os.path.join(args.input_directory, '*.fna')
-    outdir = os.path.join(args.outdir, 'create_reference')
+    outdir = os.path.join(args.outdir, 'get_read_counts')
 
     os.makedirs(outdir)
 
-    outdir = os.path.join(args.outdir, 'get_read_counts')
     bam_files = glob.glob(args.mapping_directory + '**.bam')
 
     for file in bam_files:
