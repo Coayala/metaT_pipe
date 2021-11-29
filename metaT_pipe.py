@@ -307,7 +307,7 @@ def get_read_counts(args):
 
     for file in bam_files:
         cmd = ['dirseq', '--bam', file, '--gff', args.gff, '--measure_type', 'count', '>',
-               os.path.join(outdir, file + '.counts.tsv')]
+               os.path.join(outdir, os.path.basename(file) + '.counts.tsv')]
         run_commands(cmd)
 
     counts_table = pd.read_csv(glob.glob(outdir + '**.tsv')[0])[['ID']]
