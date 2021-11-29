@@ -287,9 +287,6 @@ def map_reads(args):
     cmd = ['samtools', 'sort', os.path.join(outdir, filtered_bam_file), '-o', os.path.join(outdir, sorted_bam_file)]
     run_commands(cmd)
 
-    cmd = ['samtools', 'index', '-b', os.path.join(outdir, sorted_bam_file)]
-    run_commands(cmd)
-
 
 # --------------------------------------------------
 def get_read_counts(args):
@@ -306,6 +303,8 @@ def get_read_counts(args):
     bam_files = glob.glob(args.mapping_directory + '**.bam')
 
     for file in bam_files:
+        cmd = ['samtools', 'index', '-b', file]
+        run_commands(cmd)
         cmd = ['dirseq', '--bam', file, '--gff', args.gff, '--measure_type', 'count', '>',
                os.path.join(outdir, os.path.basename(file) + '.counts.tsv')]
         run_commands(cmd)
