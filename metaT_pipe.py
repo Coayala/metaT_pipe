@@ -305,9 +305,12 @@ def get_read_counts(args):
     for file in bam_files:
         cmd = ['samtools', 'index', '-b', file]
         run_commands(cmd)
-        cmd = ['dirseq', '--bam', file, '--gff', args.gff, '--measure_type', 'count', '>',
-               os.path.join(outdir, os.path.basename(file) + '.counts.tsv')]
-        run_commands(cmd)
+
+        cmd = ['dirseq', '--bam', file, '--gff', args.gff, '--measure_type', 'count']
+        with open(os.path.join(outdir, os.path.basename(file) + '.counts.tsv'), 'w+')as fout:
+            process = subprocess.run(cmd, shell=False, check=True, stdout=fout, stderr=subprocess.PIPE)
+            fout.seek(0)
+            output = fout.read()
 
     counts_table = pd.read_csv(glob.glob(outdir + '**.tsv')[0])[['ID']]
     counts_files = glob.glob(outdir + '**.tsv')
