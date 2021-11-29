@@ -30,16 +30,22 @@ chmod +x metaT_pipe.py
 conda env create -f environment.yml
 conda activate metaT_pipe
 ```
--Finish DRAM and GDTB-Tk installation
+- Finish DRAM and GDTB-Tk installation
 **For DRAM** follow the instructions for [DRAM septup](https://github.com/shafferm/DRAM/wiki#dram-setup)
 
 **For GDTB-Tk** run the following
 ```
 download-db.sh
 ```
+- Finish Dirseq installation
+
+```
+gem install dirseq
+```
+
 ## Usage
 
--Get help with the following command
+- Get help with the following command
 ```
 PATH_TO_META_PIPE/metaT_pipe.py -h
 ```
