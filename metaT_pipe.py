@@ -170,7 +170,7 @@ def run_commands(cmd, capture_stdout=False, filename=None):
             cmd, shell=False, check=True, stderr=subprocess.STDOUT
         )
     else:
-        with open(filename) as fout:
+        with open(filename, 'w+') as fout:
             p = subprocess.run(
                 cmd, shell=False, check=True, stdout=fout, stderr=subprocess.PIPE
             )
@@ -300,7 +300,8 @@ def map_reads(args):
         bam_file = os.path.join(outdir, args.mapping_reference + args.interleaved + '.bam')
 
     filtered_bam_file = 'filtered' + bam_file
-    cmd = ['coverm', 'filter', '-b', os.path.join(outdir, bam_file), '-o', os.path.join(outdir, filtered_bam_file), '-t', str(args.threads)]
+    cmd = ['coverm', 'filter', '-b', os.path.join(outdir, bam_file), '-o', os.path.join(outdir, filtered_bam_file),
+           '-t', str(args.threads)]
     run_commands(cmd)
 
     sorted_bam_file = 'sorted.' + filtered_bam_file
