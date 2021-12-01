@@ -41,6 +41,12 @@ def get_args():
                            help='Output directory',
                            default='metaT_pipe_out')
 
+    parser_cr.add_argument('-x'
+                           '--extension',
+                           type=str,
+                           help='Extension of the bins or contigs files',
+                           default='fna')
+
     parser_cr.add_argument('-t',
                            '--threads',
                            help='Number of threads',
@@ -173,7 +179,7 @@ def create_reference(args):
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
 
-    inputdir = os.path.join(args.input_directory, '*.fna')
+    inputdir = os.path.join(args.input_directory, '*.' + args.extension)
     outdir = os.path.join(args.outdir, 'create_reference')
 
     if not os.path.exists(outdir):
@@ -324,7 +330,7 @@ def get_read_counts(args):
         temp = temp[['ID', colname]]
         counts_table = counts_table.merge(temp, on='ID')
 
-    counts_table.to_csv(os.path.join(outdir, 'final_counts_table.csv'))
+    counts_table.to_csv(os.path.join(outdir, 'final_counts_table.csv'), index=False)
 
 
 # --------------------------------------------------
