@@ -313,8 +313,7 @@ def get_read_counts(args):
             fout.seek(0)
             output = fout.read()
 
-    counts_files = glob.glob(os.path.join(outdir + '**.tsv'))
-    print(counts_files)
+    counts_files = glob.glob(os.path.join(outdir, '**.tsv'))
     counts_table = pd.read_csv(str(counts_files[0]), sep='\t')[['ID']]
     for file in counts_files:
         print(f'Merging file: {file}')
