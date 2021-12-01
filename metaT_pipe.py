@@ -205,11 +205,11 @@ def create_reference(args):
         run_commands(cmd, capture_stdout=True, filename=os.path.join(outdir, 'concat_contigs.fasta'))
 
         cmd = ['cd-hit-est', '-i', os.path.join(outdir, 'concat_contigs.fasta'), '-o',
-               os.path.join(outdir, 'temp_contigs99.fasta'), '-c', '0.99', '-n', '10', '-T', str(args.threads)]
+               os.path.join(outdir, 'dereplicated.contigs99.fasta'), '-c', '0.99', '-n', '10', '-T', str(args.threads)]
         run_commands(cmd)
 
         cmd = ['seqkit', 'seq', '-m', '2000', os.path.join(outdir, 'temp_contigs99.fasta')]
-        run_commands(cmd, capture_stdout=True, filename=os.path.join(outdir, 'derep_contigs99.fasta'))
+        run_commands(cmd, capture_stdout=True, filename=os.path.join(outdir, 'dereplicated.contigs99.filtered.fasta'))
 
         cmd = ['rm', os.path.join(outdir, 'concat_contigs.fasta'), os.path.join(outdir, 'temp_contigs99.fasta')]
         run_commands(cmd)
