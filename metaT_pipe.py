@@ -303,6 +303,7 @@ def get_read_counts(args):
     bam_files = glob.glob(args.mapping_directory + '**.bam')
 
     for file in bam_files:
+        print(f'Extracting counts from file: {file}')
         cmd = ['samtools', 'index', '-b', file]
         run_commands(cmd)
 
@@ -313,8 +314,10 @@ def get_read_counts(args):
             output = fout.read()
 
     counts_files = glob.glob(os.path.join(outdir + '**.tsv'))
+    print(counts_files)
     counts_table = pd.read_csv(str(counts_files[0]), sep='\t')[['ID']]
     for file in counts_files:
+        print(f'Merging file: {file}')
         colname = os.path.basename(file)
         temp = pd.read_csv(file, sep='\t')
         temp[colname] = temp['forward_read_count'] - temp['reverse_read_count']
