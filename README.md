@@ -30,7 +30,9 @@ chmod +x metaT_pipe.py
 conda env create -f environment.yml
 conda activate metaT_pipe
 ```
-- Finish DRAM and GDTB-Tk installation
+### Finish Installation for software that require databases
+
+**For CheckM** download the required database reference data following the instructions from [CheckM website](https://github.com/Ecogenomics/CheckM/wiki/Installation).
 
 **For DRAM** follow the instructions for [DRAM septup](https://github.com/shafferm/DRAM/wiki#dram-setup)
 
@@ -38,7 +40,7 @@ conda activate metaT_pipe
 ```
 download-db.sh
 ```
-- Finish Dirseq installation
+**For Dirseq** installation
 
 ```
 gem install dirseq
