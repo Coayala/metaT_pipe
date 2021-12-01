@@ -184,6 +184,7 @@ def run_commands(cmd, capture_stdout=False, filename=None):
 def create_reference(args):
     """Create reference file for mapping"""
 
+    # Creating output directories
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
 
@@ -192,26 +193,32 @@ def create_reference(args):
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
+    # Bin dereplication
     if args.input_type == 'bins':
         input_bins = glob.glob(os.path.join(args.input_directory, '**.' + args.extension))
         cmd = ['dRep', 'dereplicate', outdir, '-g']
         cmd.extend(input_bins)
         run_commands(cmd)
 
+    # Contigs dereplication
     if args.input_type == 'contigs':
+        # Concatenating all contigs in a single file
         input_contigs = glob.glob(os.path.join(args.input_directory, '**.' + args.extension))
         cmd = ['cat']
         cmd.extend(input_contigs)
         run_commands(cmd, capture_stdout=True, filename=os.path.join(outdir, 'concat_contigs.fasta'))
 
+        # Using cd-hit dereplicating contigs
         cmd = ['cd-hit-est', '-i', os.path.join(outdir, 'concat_contigs.fasta'), '-o',
                os.path.join(outdir, 'dereplicated.contigs99.fasta'), '-c', '0.99', '-n', '10', '-T', str(args.threads)]
         run_commands(cmd)
 
+        # Filtering contigs that are small
         cmd = ['seqkit', 'seq', '-m', '2000', os.path.join(outdir, 'temp_contigs99.fasta')]
         run_commands(cmd, capture_stdout=True, filename=os.path.join(outdir, 'dereplicated.contigs99.filtered.fasta'))
 
-        cmd = ['rm', os.path.join(outdir, 'concat_contigs.fasta'), os.path.join(outdir, 'temp_contigs99.fasta')]
+        # Removing file with concatenated contigs
+        cmd = ['rm', os.path.join(outdir, 'concat_contigs.fasta')]
         run_commands(cmd)
 
 
@@ -219,6 +226,7 @@ def create_reference(args):
 def annotate_reference(args):
     """Annotate reference"""
 
+    # Creating output directories
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
 
@@ -227,7 +235,9 @@ def annotate_reference(args):
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
+    # Bin annotation
     if args.reference_type == 'bins':
+        # Running CheckM and GTDB-tk according to user's instructions
         if not args.no_checkm:
             cmd = ['checkm', 'lineage_wf', '-t', str(args.threads), '-x', 'fna', args.input_reference,
                    os.path.join(outdir, 'checkm_results')]
@@ -241,6 +251,7 @@ def annotate_reference(args):
                    os.path.join(outdir, 'gtdb-tk_results'), '--cpus', str(args.threads)]
             run_commands(cmd)
 
+        # Running DRAM depending on wheter or not CheckM and GTDB-tk results are available
         if args.no_checkm is False and args.no_gtdbtk is False:
             cmd = ['DRAM.py', 'annotate', '-i', os.path.join(args.input_reference, '*.fna'), '-o',
                    os.path.join(outdir, 'dram_results'), '--checkm_quality',
@@ -269,6 +280,7 @@ def annotate_reference(args):
                    '--threads', str(args.threads)]
             run_commands(cmd)
 
+    # Contig annotation
     if args.reference_type == 'contigs':
         cmd = ['DRAM.py', 'annotate', '-i', args.input_reference, '-o',
                os.path.join(outdir, 'dram_results'),
@@ -280,6 +292,7 @@ def annotate_reference(args):
 def map_reads(args):
     """Map reads to reference"""
 
+    # Creating output directories
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
 
@@ -288,6 +301,7 @@ def map_reads(args):
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
+    # Mapping reads with coverM
     if args.interleaved:
         cmd = ['coverm', 'make', '-r', args.mapping_reference, '--interleaved', args.interleaved, '-p', args.mapper,
                '-o', outdir, '-t', str(args.threads)]
@@ -299,11 +313,13 @@ def map_reads(args):
         run_commands(cmd)
         bam_file = os.path.join(outdir, args.mapping_reference + args.interleaved + '.bam')
 
+    # Filtering bam files to remove unmapped reads
     filtered_bam_file = 'filtered' + bam_file
     cmd = ['coverm', 'filter', '-b', os.path.join(outdir, bam_file), '-o', os.path.join(outdir, filtered_bam_file),
            '-t', str(args.threads)]
     run_commands(cmd)
 
+    # Sorting bam files for downstream analysis
     sorted_bam_file = 'sorted.' + filtered_bam_file
     cmd = ['samtools', 'sort', os.path.join(outdir, filtered_bam_file), '-o', os.path.join(outdir, sorted_bam_file)]
     run_commands(cmd)
@@ -313,6 +329,7 @@ def map_reads(args):
 def get_read_counts(args):
     """Get number of reads that mapped to each gene"""
 
+    # Creating output directories
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
 
@@ -321,9 +338,10 @@ def get_read_counts(args):
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
+    # Extracting read counts using dirseq
     bam_files = glob.glob(args.mapping_directory + '**.bam')
-
     for file in bam_files:
+        # Creating bam file index
         print(f'Extracting counts from file: {file}')
         cmd = ['samtools', 'index', '-b', file]
         run_commands(cmd)
@@ -334,6 +352,7 @@ def get_read_counts(args):
             fout.seek(0)
             output = fout.read()
 
+    # Merging count files and correcting final counts based on https://www.nature.com/articles/s41586-018-0338-1#Sec8
     counts_files = glob.glob(os.path.join(outdir, '**.tsv'))
     counts_table = pd.read_csv(str(counts_files[0]), sep='\t')[['ID']]
     for file in counts_files:
