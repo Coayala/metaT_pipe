@@ -186,7 +186,9 @@ def create_reference(args):
         os.makedirs(outdir)
 
     if args.input_type == 'bins':
-        cmd = ['dRep', 'dereplicate', outdir, '-g', inputdir]
+        input_bins = glob.glob(os.path.join(args.input_directory, '**.' + args.extension))
+        cmd = ['dRep', 'dereplicate', outdir, '-g']
+        cmd.extend(input_bins)
         run_commands(cmd)
     if args.input_type == 'contigs':
         cmd = ['cat', inputdir, '>', 'concat_contigs.fasta']
