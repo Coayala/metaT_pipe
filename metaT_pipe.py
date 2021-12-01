@@ -41,7 +41,7 @@ def get_args():
                            help='Output directory',
                            default='metaT_pipe_out')
 
-    parser_cr.add_argument('-x'
+    parser_cr.add_argument('-x',
                            '--extension',
                            type=str,
                            help='Extension of the bins or contigs files',
