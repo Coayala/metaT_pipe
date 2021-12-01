@@ -312,13 +312,14 @@ def get_read_counts(args):
             fout.seek(0)
             output = fout.read()
 
-    counts_table = pd.read_csv(glob.glob(outdir + '**.tsv')[0])[['ID']]
-    counts_files = glob.glob(outdir + '**.tsv')
+    counts_files = glob.glob(os.path.join(outdir + '**.tsv'))
+    counts_table = pd.read_csv(str(counts_files[0]), sep='\t')[['ID']]
     for file in counts_files:
+        colname = os.path.basename(file)
         temp = pd.read_csv(file, sep='\t')
-        temp['final_count'] = temp['forward_read_count'] - temp['reverse_read_count']
-        temp[temp['final_count'] < 0] = 0
-        temp = temp[['ID', 'final_count']]
+        temp[colname] = temp['forward_read_count'] - temp['reverse_read_count']
+        temp[temp[colname] < 0] = 0
+        temp = temp[['ID', colname]]
         counts_table = counts_table.merge(temp, on='ID')
 
     counts_table.to_csv(os.path.join(outdir, 'final_counts_table.csv'))
