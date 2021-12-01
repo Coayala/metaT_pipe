@@ -230,7 +230,7 @@ def annotate_reference(args):
             run_commands(cmd)
 
         if args.no_checkm is False and args.no_gtdbtk is False:
-            cmd = ['DRAM.py', 'annotate', '-i', "'" + os.path.join(args.input_reference, '*.fna') + "'", '-o',
+            cmd = ['DRAM.py', 'annotate', '-i', os.path.join(args.input_reference, '*.fna'), '-o',
                    os.path.join(outdir, 'dram_results'), '--checkm_quality',
                    os.path.join(outdir, 'checkm_results', 'checkm_table.tsv'), '--gtdb_taxonomy',
                    os.path.join(outdir, 'gtdb-tk_results', 'classify', 'gtdbtk.bac120.summary.tsv'),
