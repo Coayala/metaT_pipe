@@ -162,12 +162,20 @@ def get_args():
 
 
 # --------------------------------------------------
-def run_commands(cmd):
+def run_commands(cmd, capture_stdout=False, filename=None):
     """Function to run commands in the command line"""
 
-    p = subprocess.run(
-        cmd, shell=False, check=True, stderr=subprocess.STDOUT
-    )
+    if not capture_stdout:
+        p = subprocess.run(
+            cmd, shell=False, check=True, stderr=subprocess.STDOUT
+        )
+    else:
+        with open(filename) as fout:
+            p = subprocess.run(
+                cmd, shell=False, check=True, stdout=fout, stderr=subprocess.PIPE
+            )
+            fout.seek(0)
+            fout.read()
 
     return p
 
@@ -179,7 +187,6 @@ def create_reference(args):
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
 
-    inputdir = os.path.join(args.input_directory, '*.' + args.extension)
     outdir = os.path.join(args.outdir, 'create_reference')
 
     if not os.path.exists(outdir):
@@ -190,16 +197,21 @@ def create_reference(args):
         cmd = ['dRep', 'dereplicate', outdir, '-g']
         cmd.extend(input_bins)
         run_commands(cmd)
+
     if args.input_type == 'contigs':
-        cmd = ['cat', inputdir, '>', 'concat_contigs.fasta']
+        input_contigs = glob.glob(os.path.join(args.input_directory, '**.' + args.extension))
+        cmd = ['cat']
+        cmd.extend(input_contigs)
+        run_commands(cmd, capture_stdout=True, filename=os.path.join(outdir, 'concat_contigs.fasta'))
+
+        cmd = ['cd-hit-est', '-i', os.path.join(outdir, 'concat_contigs.fasta'), '-o',
+               os.path.join(outdir, 'temp_contigs99.fasta'), '-c', '0.99', '-n', '10', '-T', str(args.threads)]
         run_commands(cmd)
-        cmd = ['cd-hit-est', '-i', 'concat_contigs.fasta', '-o', 'temp_contigs99.fasta',
-               '-c', '0.99', '-n', '10', '-T', str(args.threads)]
-        run_commands(cmd)
-        cmd = ['seqkit', 'seq', '-m', '2000', 'temp_contigs99.fasta', '>',
-               os.path.join(outdir, 'derep_contigs99.fasta')]
-        run_commands(cmd)
-        cmd = ['rm', 'concat_contigs.fasta', 'temp_contigs99.fasta']
+
+        cmd = ['seqkit', 'seq', '-m', '2000', os.path.join(outdir, 'temp_contigs99.fasta')]
+        run_commands(cmd, capture_stdout=True, filename=os.path.join(outdir, 'derep_contigs99.fasta'))
+
+        cmd = ['rm', os.path.join(outdir, 'concat_contigs.fasta'), os.path.join(outdir, 'temp_contigs99.fasta')]
         run_commands(cmd)
 
 
