@@ -314,7 +314,7 @@ def map_reads(args):
         bam_file = os.path.basename(args.mapping_reference) + '.' + os.path.basename(args.r1) + '.bam'
 
     # Filtering bam files to remove unmapped reads
-    filtered_bam_file = 'filtered' + bam_file
+    filtered_bam_file = 'filtered.' + bam_file
     cmd = ['coverm', 'filter', '-b', os.path.join(outdir, bam_file), '-o', os.path.join(outdir, filtered_bam_file),
            '-t', str(args.threads)]
     run_commands(cmd)
